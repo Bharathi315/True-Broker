@@ -74,6 +74,7 @@ flutter:
     - assets/add_sell/
     - assets/shorts/
     - assets/coin/
+    - assets/icons/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

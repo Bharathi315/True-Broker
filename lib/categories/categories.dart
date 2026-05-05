@@ -1,4 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:truebroker/categories/detail_screen.dart';
+import '../categories_filter/commercial_land_filter.dart';
+import '../categories_filter/commercial_office_filter.dart';
+import '../categories_filter/hostel_pg_filter.dart';
+import '../categories_filter/hotel_filter.dart';
+import '../categories_filter/industrial_building_filter.dart';
+import '../categories_filter/residential_house_filter.dart';
+import '../categories_filter/residential_land_filter.dart';
+import '../categories_filter/residential_plots_filter.dart';
+import '../categories_filter/residential_villaz_filter.dart';
+import '../categories_filter/shop_commercial_filter.dart';
 
 class CategoriesScreen extends StatefulWidget {
   final Widget? bottomNavigationBar;
@@ -61,23 +72,69 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     'Industrial Building':  ['assets/categories/building.png','assets/categories/building.png','assets/categories/building.png','assets/categories/building.png',
       'assets/categories/building.png','assets/categories/building.png','assets/categories/building.png','assets/categories/building.png'], };
 
+  void _showFilterSheet() {
+    switch (_selectedCategory) {
+      case 'Residential House':
+        showResidentialHouseFilterSheet(context);
+        break;
+      case 'Residential Lands':
+        showResidentialLandFilterSheet(context);
+        break;
+      case 'Residential Villaz':
+        showResidentialVillaFilterSheet(context);
+        break;
+      case 'Commercial Lands':
+        showCommercialLandFilterSheet(context);
+        break;
+      case 'Shop Commercial':
+        showShopCommercialFilterSheet(context);
+        break;
+      case 'Commercial Office':
+        showCommercialOfficeFilterSheet(context);
+        break;
+      case 'Residential Plots':
+        showResidentialPlotsFilterSheet(context);
+        break;
+      case 'Hotel':
+        showHotelFilterSheet(context);
+        break;
+      case 'Hostel & PG':
+        showHostelPGFilterSheet(context);
+        break;
+      case 'Industrial Building':
+        showIndustrialBuildingFilterSheet(context);
+        break;
+      default:
+      // Handle 'For You' or other cases if needed
+        break;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final double sw = MediaQuery.of(context).size.width;
+    final double sh = MediaQuery.of(context).size.height;
+
+    double pw(double px) => px * sw / 360;
+    double ph(double px) => px * sh / 800;
+
     return Scaffold(
       backgroundColor: Colors.white,
+      extendBody: true,
       bottomNavigationBar: widget.bottomNavigationBar,
       appBar: AppBar(
         backgroundColor: const Color(0xFF742B88),
         elevation: 0,
+        toolbarHeight: ph(56),
         leading: GestureDetector(
           onTap: widget.onBack ?? () => Navigator.pop(context),
-          child: const Icon(Icons.arrow_back, color: Colors.white, size: 22),
+          child: Icon(Icons.arrow_back, color: Colors.white, size: pw(22)),
         ),
-        title: const Text(
+        title: Text(
           'Categories',
           style: TextStyle(
             fontFamily: 'Lato',
-            fontSize: 20,
+            fontSize: pw(20),
             fontWeight: FontWeight.w400,
             color: Colors.white,
             height: 1.0,
@@ -91,7 +148,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
         children: [
           // ── LEFT sidebar ──────────────────────────────────────────
           SizedBox(
-            width: 115,
+            width: pw(115),
             child: ListView.builder(
               itemCount: _categories.length,
               itemBuilder: (ctx, i) {
@@ -101,7 +158,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                   onTap: () =>
                       setState(() => _selectedCategory = cat['label']),
                   child: Container(
-                    width: 115,
+                    width: pw(115),
                     decoration: BoxDecoration(
                       color: isSelected
                           ? Colors.white
@@ -112,25 +169,24 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             color: Color(0xFFCAC5C5), width: 1),
                       ),
                     ),
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 12, horizontal: 6),
+                    padding: EdgeInsets.symmetric(
+                        vertical: ph(12), horizontal: pw(6)),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
                             cat['icon'] as IconData,
-                            size: 26,
-                            color: Color(0xFF742B88)
+                            size: pw(26),
+                            color: const Color(0xFF742B88)
                         ),
-                        const SizedBox(height: 5),
+                        SizedBox(height: ph(5)),
                         Text(
                           cat['label'],
                           textAlign: TextAlign.center,
                           style: TextStyle(
-                            fontSize: 10,
+                            fontSize: pw(10),
                             fontWeight: FontWeight.w400,
-                            color: Color(0xFF000000),
-
+                            color: const Color(0xFF000000),
                             height: 1.3,
                           ),
                         ),
@@ -147,14 +203,14 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
           // ── RIGHT content ────────────────────────────────────────────
           Expanded(
-            child: _buildRightContent(),
+            child: _buildRightContent(pw, ph),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildRightContent() {
+  Widget _buildRightContent(double Function(double) pw, double Function(double) ph) {
     final images = _categoryImages[_selectedCategory] ?? [];
     final half = (images.length / 2).ceil();
     final topImages    = images.take(half).toList();
@@ -168,11 +224,15 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
             title: _selectedCategory,
             images: topImages,
             showFilter: true,
+            pw: pw,
+            ph: ph,
           ),
           _buildSection(
             title: 'Popular',
             images: bottomImages,
             showFilter: false,
+            pw: pw,
+            ph: ph,
           ),
         ],
       ),
@@ -183,19 +243,21 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     required String title,
     required List<String> images,
     bool showFilter = false,
+    required double Function(double) pw,
+    required double Function(double) ph,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: const EdgeInsets.fromLTRB(10, 10, 10, 8),
+          padding: EdgeInsets.fromLTRB(pw(10), ph(10), pw(10), ph(8)),
           child: Row(
             children: [
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(
-                      fontSize: 12,
+                  style: TextStyle(
+                      fontSize: pw(12),
                       fontWeight: FontWeight.w400,
                       color: Colors.black,
                       fontFamily: 'Inter'
@@ -205,32 +267,39 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
               ),
               if (showFilter)
                 Padding(
-                  padding: const EdgeInsets.only(left: 8.0),
-                  child: Image.asset(
-                    'assets/categories/filter.png',
-                    height: 25,
-                    width: 20,
-                    errorBuilder: (context, error, stackTrace) => const Icon(Icons.filter_list, size: 20, color: Color(0xFF742B88)),
+                  padding: EdgeInsets.only(left: pw(8.0)),
+                  child: GestureDetector(
+                    onTap: _showFilterSheet,
+                    child: Image.asset(
+                      'assets/categories/filter.png',
+                      height: ph(25),
+                      width: pw(20),
+                      errorBuilder: (context, error, stackTrace) =>
+                          Icon(Icons.filter_list,
+                              size: pw(20), color: const Color(0xFF742B88)),
+                    ),
                   ),
                 )
             ],
           ),
         ),
         Padding(
-          padding: const EdgeInsets.all(15),
+          padding: EdgeInsets.all(pw(15)),
           child: GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
             gridDelegate:
-            const SliverGridDelegateWithFixedCrossAxisCount(
+            SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
-              crossAxisSpacing: 8,
-              mainAxisSpacing: 10,
+              crossAxisSpacing: pw(8),
+              mainAxisSpacing: ph(10),
               childAspectRatio: 0.92,
             ),
             itemCount: images.isEmpty ? 4 : images.length,
             itemBuilder: (ctx, i) => _buildPropertyCard(
               imagePath: images.isEmpty ? '' : images[i],
+              pw: pw,
+              ph: ph,
             ),
           ),
         ),
@@ -238,78 +307,90 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
     );
   }
 
-  Widget _buildPropertyCard({required String imagePath}) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFF742B88), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 3,
-            offset: const Offset(0, 2),
+  Widget _buildPropertyCard({
+    required String imagePath,
+    required double Function(double) pw,
+    required double Function(double) ph,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PropertyDetailPage(),
           ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(7),
-                topRight: Radius.circular(7),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: const Color(0xFF742B88), width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 3,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(7),
+                  topRight: Radius.circular(7),
+                ),
+                child: imagePath.isNotEmpty
+                    ? Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  errorBuilder: (_, __, ___) => _placeholderBox(pw),
+                )
+                    : _placeholderBox(pw),
               ),
-              child: imagePath.isNotEmpty
-                  ? Image.asset(
-                imagePath,
-                fit: BoxFit.cover,
-                width: double.infinity,
-                errorBuilder: (_, __, ___) =>
-                    _placeholderBox(),
-              )
-                  : _placeholderBox(),
             ),
-          ),
-          // Title
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 6, vertical: 5),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.home,
-                  size: 13,
-                  color: Color(0xff742B88),
-                ),
-                SizedBox(width: 4),
-                Expanded(
-                  child: Text(
-                    'Luxury Family Home',
-                    style: TextStyle(
-                      fontSize: 7,
-                      fontWeight: FontWeight.w500,
-                      color: Color(0xff444444),
-                      fontFamily: 'Lato',
+
+            Padding(
+              padding: EdgeInsets.symmetric(
+                  horizontal: pw(6), vertical: ph(5)),
+              child: Row(
+                children: [
+                  Icon(Icons.home,
+                      size: pw(13),
+                      color: const Color(0xff742B88)),
+                  SizedBox(width: pw(4)),
+                  Expanded(
+                    child: Text(
+                      'Luxury Family Home',
+                      style: TextStyle(
+                        fontSize: pw(7),
+                        fontWeight: FontWeight.w500,
+                        color: const Color(0xff444444),
+                        fontFamily: 'Lato',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
-                ),
-              ],
-            ),
-          )
-        ],
+                ],
+              ),
+            )
+          ],
+        ),
       ),
     );
   }
 
-  Widget _placeholderBox() {
+  Widget _placeholderBox(double Function(double) pw) {
     return Container(
       color: const Color(0xFFEDD9F5),
-      child: const Center(
+      child: Center(
         child: Icon(Icons.house_outlined,
-            size: 36, color: Color(0xFF742B88)),
+            size: pw(36), color: const Color(0xFF742B88)),
       ),
     );
   }

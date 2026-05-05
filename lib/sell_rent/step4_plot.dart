@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:truebroker/categories/detail_screen.dart';
 
 class Step4Plot extends StatefulWidget {
   const Step4Plot({super.key});
@@ -361,7 +362,7 @@ class _Step4PlotState extends State<Step4Plot> {
                         height: 42,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.of(context).popUntil((route) => route.isFirst);
+                            Navigator.push(context, MaterialPageRoute(builder: (context)=>PropertyDetailPage()));
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF742B88),

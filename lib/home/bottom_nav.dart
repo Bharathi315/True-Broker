@@ -1,8 +1,10 @@
+//bottom_nav_bar///
 import 'package:flutter/material.dart';
 import 'package:truebroker/categories/categories.dart';
 import 'package:truebroker/home/homescreen.dart';
 import 'package:truebroker/message/message1.dart';
 import 'package:truebroker/sell_rent/add_basic_sell.dart';
+import 'package:truebroker/shorts/shorts.dart';
 
 class FrontScreen extends StatefulWidget {
   const FrontScreen({super.key});
@@ -39,8 +41,20 @@ class _FrontScreenState extends State<FrontScreen> {
           ),
           onBack: () => _onNavItemTapped(0),
         );
+      case 2:
+        return ShortsPage(
+          bottomNavigationBar: CustomBottomNavBar(
+            currentIndex: _currentIndex,
+            onTap: _onNavItemTapped,
+          ),
+          onBack: () => _onNavItemTapped(0),
+        );
       case 3:
-        return Add_Basic(
+        return AddBasicSell(
+          bottomNavigationBar: CustomBottomNavBar(
+            currentIndex: _currentIndex,
+            onTap: _onNavItemTapped,
+          ),
           onBack: () => _onNavItemTapped(0),
         );
       case 4:
@@ -95,21 +109,25 @@ class CustomBottomNavBar extends StatelessWidget {
                 _buildNavItem('assets/bottomnavbar/homelogo.png', 'Home', 0),
                 _buildNavItem('assets/bottomnavbar/applogo.png', 'Categories', 1),
                 Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 30),
-                      const Text(
-                        'TBshorts',
-                        style: TextStyle(
-                          fontFamily: 'Lato',
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          height: 1.0,
+                  child: GestureDetector(
+                    onTap: () => onTap(2),
+                    behavior: HitTestBehavior.opaque,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const SizedBox(height: 30),
+                        const Text(
+                          'TBshorts',
+                          style: TextStyle(
+                            fontFamily: 'Lato',
+                            color: Colors.white,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            height: 1.0,
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 _buildNavItem('assets/bottomnavbar/Vector.png', 'Sell/Rent', 3),
@@ -126,7 +144,6 @@ class CustomBottomNavBar extends StatelessWidget {
                 width: 66,
                 height: 66,
                 decoration: const BoxDecoration(
-                  color: Colors.white,
                   shape: BoxShape.circle,
                 ),
                 padding: const EdgeInsets.all(6),
@@ -230,6 +247,7 @@ class BNBCustomPainter extends CustomPainter {
     path.lineTo(0, height);
     path.close();
 
+    canvas.drawShadow(path, Colors.black, 8, true);
     canvas.drawPath(path, paint);
   }
 

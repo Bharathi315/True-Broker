@@ -4,7 +4,14 @@ import 'filter.dart';
 import 'post.dart';
 
 class ShortsPage extends StatefulWidget {
-  const ShortsPage({super.key});
+  final Widget? bottomNavigationBar;
+  final VoidCallback? onBack;
+
+  const ShortsPage({
+    super.key,
+    this.bottomNavigationBar,
+    this.onBack,
+  });
 
   @override
   State<ShortsPage> createState() => _ShortsPageState();
@@ -14,11 +21,7 @@ class _ShortsPageState extends State<ShortsPage> {
   static const Color _purple = Color(0xFF7C348D);
 
   final List<Map<String, dynamic>> _stories = [
-    {'label': 'Add Post', 'isAdd': true},
-    {'label': 'Anna Nag..', 'isAdd': false, 'img': 'assets/shorts/story1.png'},
-    {'label': 'Coimbator', 'isAdd': false, 'img': 'assets/shorts/story2.png'},
-    {'label': 'Trichy', 'isAdd': false, 'img': 'assets/shorts/story3.png'},
-    {'label': 'Chennai', 'isAdd': false, 'img': 'assets/shorts/story4.png'},
+    {'label': 'Add Post', 'isAdd': true,'img': 'assets/categories/house.png'},
   ];
 
   final List<Map<String, dynamic>> _shorts = [
@@ -69,6 +72,8 @@ class _ShortsPageState extends State<ShortsPage> {
     return Scaffold(
       backgroundColor: Colors.black,
       extendBodyBehindAppBar: true,
+      // ── bottomNavigationBar passed from parent ──
+      bottomNavigationBar: widget.bottomNavigationBar,
       body: Stack(
         children: [
           PageView.builder(
@@ -84,7 +89,7 @@ class _ShortsPageState extends State<ShortsPage> {
             itemBuilder: (_, i) => _fullScreenShort(_shorts[i]),
           ),
 
-          // ── Top overlay: AppBar + Stories ─────────────────────────────
+          // ── Top overlay: AppBar + Stories ──
           SafeArea(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -99,15 +104,16 @@ class _ShortsPageState extends State<ShortsPage> {
     );
   }
 
-  // ─── APP BAR (transparent over video) ────────────────────────────────────
+  // ─── APP BAR ─────────────────────────────────────────────────────────────
   Widget _buildAppBar() {
     return Container(
-      color: Colors.white, // full white background
+      color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       child: Row(
         children: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
+            // use onBack callback if provided, else pop
+            onTap: widget.onBack ?? () => Navigator.pop(context),
             child: Container(
               width: 36,
               height: 36,
@@ -115,15 +121,10 @@ class _ShortsPageState extends State<ShortsPage> {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: const Icon(
-                Icons.arrow_back,
-                color: Colors.black, // changed to black
-                size: 20,
-              ),
+              child: const Icon(Icons.arrow_back, color: Colors.black, size: 20),
             ),
           ),
           const Spacer(),
-
           GestureDetector(
             onTap: _openFilter,
             child: Container(
@@ -251,24 +252,16 @@ class _ShortsPageState extends State<ShortsPage> {
     return Stack(
       fit: StackFit.expand,
       children: [
-        // ── Background image fills full screen ────────────────────────
         Image.asset(
           d['img'],
           fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) =>
-              Container(
-                color: const Color(0xFF1A1A1A),
-                child: const Center(
-                  child: Icon(
-                    Icons.play_circle_fill,
-                    color: Colors.white24,
-                    size: 72,
-                  ),
-                ),
-              ),
+          errorBuilder: (_, __, ___) => Container(
+            color: const Color(0xFF1A1A1A),
+            child: const Center(
+              child: Icon(Icons.play_circle_fill, color: Colors.white24, size: 72),
+            ),
+          ),
         ),
-
-        // ── Dark gradient overlay (bottom) ────────────────────────────
         Positioned.fill(
           child: DecoratedBox(
             decoration: BoxDecoration(
@@ -286,8 +279,7 @@ class _ShortsPageState extends State<ShortsPage> {
           ),
         ),
 
-
-        // ── Right side action icons (YouTube Shorts style) ────────────
+        // Right side actions
         Positioned(
           right: 12,
           bottom: 200,
@@ -304,7 +296,7 @@ class _ShortsPageState extends State<ShortsPage> {
           ),
         ),
 
-        // ── Bottom overlay: property info ─────────────────────────────
+        // Bottom property info
         Positioned(
           left: 0,
           right: 0,
@@ -316,10 +308,8 @@ class _ShortsPageState extends State<ShortsPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // For Sale tag
                   Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
                       color: d['tag'] == 'For Sale'
                           ? const Color(0xFF2E7D32)
@@ -329,94 +319,60 @@ class _ShortsPageState extends State<ShortsPage> {
                     child: Text(
                       d['tag'],
                       style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
+                          color: Colors.white, fontSize: 11, fontWeight: FontWeight.w600),
                     ),
                   ),
                   const SizedBox(height: 6),
-
-                  // Price
                   Text(
                     d['price'],
                     style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                        fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                   const SizedBox(height: 2),
-
-                  // Title
-                  Text(
-                    d['title'],
-                    style: const TextStyle(
-                        fontSize: 13, color: Colors.white70),
-                  ),
+                  Text(d['title'],
+                      style: const TextStyle(fontSize: 13, color: Colors.white70)),
                   const SizedBox(height: 5),
-
-                  // Location
                   Row(
                     children: [
-                      const Icon(Icons.location_on,
-                          size: 13, color: Colors.white54),
+                      const Icon(Icons.location_on, size: 13, color: Colors.white54),
                       const SizedBox(width: 4),
-                      Text(
-                        d['location'],
-                        style: const TextStyle(
-                            fontSize: 12, color: Colors.white54),
-                      ),
+                      Text(d['location'],
+                          style: const TextStyle(fontSize: 12, color: Colors.white54)),
                     ],
                   ),
                   const SizedBox(height: 8),
-
-                  // Badges
                   Row(
                     children: (d['badges'] as List<String>)
-                        .map(
-                          (b) =>
-                          Padding(
-                            padding: const EdgeInsets.only(right: 6),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: Colors.white12,
-                                borderRadius: BorderRadius.circular(4),
-                                border: Border.all(color: Colors.white24),
-                              ),
-                              child: Text(
-                                b,
-                                style: const TextStyle(
-                                    fontSize: 10, color: Colors.white70),
-                              ),
-                            ),
-                          ),
-                    )
+                        .map((b) => Padding(
+                      padding: const EdgeInsets.only(right: 6),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: Colors.white12,
+                          borderRadius: BorderRadius.circular(4),
+                          border: Border.all(color: Colors.white24),
+                        ),
+                        child: Text(b,
+                            style: const TextStyle(
+                                fontSize: 10, color: Colors.white70)),
+                      ),
+                    ))
                         .toList(),
                   ),
                   const SizedBox(height: 12),
-
-                  // Agent row
                   Row(
                     children: [
-                      // Agent circle
                       CircleAvatar(
                         radius: 18,
                         backgroundColor: _purple,
-                        child: Text(
-                          d['agent'],
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
+                        child: Text(d['agent'],
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold)),
                       ),
                       const SizedBox(width: 8),
-
-                      // Name + verified + rating
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -424,15 +380,12 @@ class _ShortsPageState extends State<ShortsPage> {
                             Row(
                               children: [
                                 Flexible(
-                                  child: Text(
-                                    d['agentName'],
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
+                                  child: Text(d['agentName'],
+                                      style: const TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.white),
+                                      overflow: TextOverflow.ellipsis),
                                 ),
                                 if (d['verified'] == true) ...[
                                   const SizedBox(width: 3),
@@ -444,44 +397,31 @@ class _ShortsPageState extends State<ShortsPage> {
                             Row(
                               children: [
                                 if (d['verified'] == true)
-                                  const Text(
-                                    '✓ Verified · ',
-                                    style: TextStyle(
-                                        fontSize: 10, color: Colors.green),
-                                  ),
-                                const Icon(Icons.star,
-                                    color: Colors.amber, size: 11),
+                                  const Text('✓ Verified · ',
+                                      style: TextStyle(fontSize: 10, color: Colors.green)),
+                                const Icon(Icons.star, color: Colors.amber, size: 11),
                                 const SizedBox(width: 2),
-                                Text(
-                                  '${d['rating']} · ${d['agentLoc']}',
-                                  style: const TextStyle(
-                                      fontSize: 10, color: Colors.white54),
-                                ),
+                                Text('${d['rating']} · ${d['agentLoc']}',
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.white54)),
                               ],
                             ),
                           ],
                         ),
                       ),
-
-                      // Share + time (right side)
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          const Icon(Icons.share,
-                              color: Colors.white38, size: 16),
+                          const Icon(Icons.share, color: Colors.white38, size: 16),
                           const SizedBox(height: 2),
-                          Text(
-                            d['time'],
-                            style: const TextStyle(
-                                fontSize: 10, color: Colors.white38),
-                          ),
+                          Text(d['time'],
+                              style: const TextStyle(
+                                  fontSize: 10, color: Colors.white38)),
                         ],
                       ),
                     ],
                   ),
                   const SizedBox(height: 12),
-
-                  // Contact button full width
                   SizedBox(
                     width: double.infinity,
                     height: 44,
@@ -490,17 +430,13 @@ class _ShortsPageState extends State<ShortsPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _purple,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+                            borderRadius: BorderRadius.circular(8)),
                       ),
-                      child: const Text(
-                        'Contact',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                      child: const Text('Contact',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600)),
                     ),
                   ),
                 ],
@@ -512,37 +448,26 @@ class _ShortsPageState extends State<ShortsPage> {
     );
   }
 
-  // ─── Side action icon ─────────────────────────────────────────────────────
   Widget _sideAction(IconData icon, String label) {
     return Column(
       children: [
         Container(
           width: 44,
           height: 44,
-          decoration: BoxDecoration(
-            color: const Color(0x33F0F0F0), // ✅ #F0F0F033
+          decoration: const BoxDecoration(
+            color: Color(0x33F0F0F0),
             shape: BoxShape.circle,
           ),
-          child: Center(
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 22,
-            ),
-          ),
+          child: Center(child: Icon(icon, color: Colors.white, size: 22)),
         ),
-
         if (label.isNotEmpty) ...[
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              shadows: [Shadow(color: Colors.black, blurRadius: 4)],
-            ),
-          ),
+          Text(label,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                  shadows: [Shadow(color: Colors.black, blurRadius: 4)])),
         ],
       ],
     );

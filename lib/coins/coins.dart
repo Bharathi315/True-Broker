@@ -58,13 +58,14 @@ class CreditCoinPlansScreen extends StatelessWidget {
         backgroundColor: Color(0xFF742B88),
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
+        titleSpacing: 0,
         title: const Text(
           'Credit Coin Plans',
           style: TextStyle(
-            color: Colors.black,
+            color: Colors.white,
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),

@@ -2,9 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:truebroker/sell_rent/step2_home.dart';
 import 'package:truebroker/sell_rent/step2_plot.dart';
 
-
 class AddBasicSell extends StatefulWidget {
-  const AddBasicSell({super.key});
+  final Widget? bottomNavigationBar;
+  final VoidCallback? onBack;
+
+  const AddBasicSell({
+    super.key,
+    this.bottomNavigationBar,
+    this.onBack,
+  });
 
   @override
   State<AddBasicSell> createState() => _AddBasicSellState();
@@ -28,13 +34,14 @@ class _AddBasicSellState extends State<AddBasicSell> {
     "Serviced Apartment",
     "Others",
   ];
+
   bool get _isNextEnabled =>
       selectedPurpose.isNotEmpty &&
           selectedPropertyType.isNotEmpty &&
           selectedPropertyOption.isNotEmpty;
+
   void _onNextTap() {
     if (!_isNextEnabled) return;
-
     if (selectedPropertyOption == "Plot / Land") {
       Navigator.push(
         context,
@@ -43,10 +50,11 @@ class _AddBasicSellState extends State<AddBasicSell> {
     } else {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (_) =>Step2Home()),
+        MaterialPageRoute(builder: (_) => Step2Home()),
       );
     }
   }
+
   Widget buildChip(
       String text,
       String selectedValue,
@@ -54,7 +62,6 @@ class _AddBasicSellState extends State<AddBasicSell> {
       double width,
       ) {
     bool isSelected = text == selectedValue;
-
     return GestureDetector(
       onTap: () => onTap(text),
       child: Container(
@@ -78,6 +85,7 @@ class _AddBasicSellState extends State<AddBasicSell> {
       ),
     );
   }
+
   Widget buildPropertyChip(String text, double width) {
     final bool isSelected = text == selectedPropertyOption;
     return GestureDetector(
@@ -112,9 +120,7 @@ class _AddBasicSellState extends State<AddBasicSell> {
             if (isSelected) ...[
               SizedBox(width: width * 0.01),
               GestureDetector(
-                onTap: () {
-                  setState(() => selectedPropertyOption = "");
-                },
+                onTap: () => setState(() => selectedPropertyOption = ""),
                 child: Container(
                   width: width * 0.04,
                   height: width * 0.04,
@@ -132,17 +138,20 @@ class _AddBasicSellState extends State<AddBasicSell> {
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    final visibleOptions = showAllProperties
-        ? propertyOptions
-        : propertyOptions.take(4).toList();
+    final visibleOptions =
+    showAllProperties ? propertyOptions : propertyOptions.take(4).toList();
     final hiddenCount = propertyOptions.length - 4;
+
     return Scaffold(
       backgroundColor: Colors.white,
+      // ── bottomNavigationBar passed from parent ──
+      bottomNavigationBar: widget.bottomNavigationBar,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -153,7 +162,8 @@ class _AddBasicSellState extends State<AddBasicSell> {
                 vertical: height * 0.015,
               ),
               child: GestureDetector(
-                onTap: () => Navigator.pop(context),
+                // use onBack callback if provided, else pop
+                onTap: widget.onBack ?? () => Navigator.pop(context),
                 child: Icon(Icons.arrow_back, size: width * 0.06),
               ),
             ),
@@ -205,7 +215,6 @@ class _AddBasicSellState extends State<AddBasicSell> {
                         }, width);
                       }).toList(),
                     ),
-
                     SizedBox(height: height * 0.015),
                     Text(
                       "What Kind Of Property?",
@@ -233,13 +242,10 @@ class _AddBasicSellState extends State<AddBasicSell> {
                     SizedBox(height: height * 0.015),
                     Wrap(
                       children: [
-                        ...visibleOptions.map(
-                              (e) => buildPropertyChip(e, width),
-                        ),
+                        ...visibleOptions.map((e) => buildPropertyChip(e, width)),
                         if (!showAllProperties && hiddenCount > 0)
                           GestureDetector(
-                            onTap: () =>
-                                setState(() => showAllProperties = true),
+                            onTap: () => setState(() => showAllProperties = true),
                             child: Container(
                               margin: EdgeInsets.only(
                                 right: width * 0.03,
@@ -251,16 +257,14 @@ class _AddBasicSellState extends State<AddBasicSell> {
                               ),
                               decoration: BoxDecoration(
                                 color: const Color(0xffFFFFFF),
-                                borderRadius:
-                                BorderRadius.circular(width * 0.05),
-                                border: Border.all(
-                                    color: const Color(0xFFFFFFFF)),
+                                borderRadius: BorderRadius.circular(width * 0.05),
+                                border: Border.all(color: const Color(0xFFFFFFFF)),
                               ),
                               child: Text(
                                 '+ $hiddenCount more',
                                 style: TextStyle(
                                   fontSize: width * 0.035,
-                                  color: const Color(0XFF1C2293),
+                                  color: const Color(0xFF1C2293),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
@@ -268,32 +272,28 @@ class _AddBasicSellState extends State<AddBasicSell> {
                           ),
                       ],
                     ),
-                    SizedBox(height: height * 0.26),
+                    SizedBox(height: height * 0.20),
                     SizedBox(
                       width: 328,
                       height: 44,
                       child: ElevatedButton(
                         onPressed: _isNextEnabled ? _onNextTap : null,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isNextEnabled
-                              ? const Color(0xFF742B88)
-                              :Color(0xFF742B88),
-                          disabledBackgroundColor: Color(0xFF742B88),
+                          backgroundColor: const Color(0xFF742B88),
+                          disabledBackgroundColor: const Color(0xFF742B88),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(6),
                           ),
                           padding: EdgeInsets.zero,
                           elevation: 0,
                         ),
-                        child: Text(
+                        child: const Text(
                           "Next",
                           style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
-                            color: _isNextEnabled
-                                ? Colors.white
-                                : Colors.white,
+                            color: Colors.white,
                           ),
                         ),
                       ),
